@@ -37,6 +37,7 @@ Bc = [0 0; 0 0; 0 0; K_1*K_pp 0; 0 0; 0 K_ep*K_3];
 Ad = Ac*delta_t+eye(6);
 Bd = Bc*delta_t;
 
+global mx mu N M alfa beta lambda_t
 
 mx = size(Ad,2); % Number of states (number of columns in A)
 mu = size(Bd,2); % Number of inputs(number of columns in B)
@@ -51,22 +52,22 @@ x0_6 = 0;                               % e dot
 x0 = [x0_1 x0_2 x0_3 x0_4 x0_5 x0_6]';            % Initial values
 
 % Time horizon and initialization
-N  = 15;                                % Time horizon for states
+N  = 40;                                % Time horizon for states
 M  = N;                                 % Time horizon for inputs
 z  = zeros(N*mx+M*mu,1);                % Initialize z for the whole horizon
-z0 = z;                                 % Initial value for optimization
+z0 = [x0;zeros(N*mx+M*mu-length(x0),1)];% Initial value for optimization
 alfa = 0.2;
 beta = 20;
 lambda_t = 2/3*pi;
 
 % Bounds
-ul 	    = -(30/180)*pi;                 % Lower bound on control
-uu 	    = (30/180)*pi;                  % Upper bound on control
+ul 	    = [-(30/180)*pi; -inf];                 % Lower bound on control
+uu 	    = [(30/180)*pi;  inf];                  % Upper bound on control
 
 xl      = -Inf*ones(mx,1);              % Lower bound on states (no bound)
 xu      = Inf*ones(mx,1);               % Upper bound on states (no bound)
-xl(3)   = ul;                           % Lower bound on state x3
-xu(3)   = uu;                           % Upper bound on state x3
+xl(3)   = ul(1);                           % Lower bound on state x3
+xu(3)   = uu(1);                           % Upper bound on state x3
 
 % Generate constraints on measurements and inputs
 [vlb,vub]       = gen_constraints(N, M, xl, xu, ul, uu); % hint: gen_constraints
@@ -84,7 +85,7 @@ Q1(6,6) = 0;                            % Weight on state x6
 R1 = zeros(mu,mu);
 R1(1,1) = 1;                            % q1 in lab manual
 R1(2,2) = 1;                            % q2 in lab manual
-Q = gen_q(Q1,R1, N, M);                 % Generate Q, hint: gen_q
+Q = 2*gen_q(Q1,R1, N, M);                 % Generate Q, hint: gen_q
 c = zeros(size(Q,2),1);                 % Generate c, this is the linear constant term in the QP
 
 %% Generate system matrixes for linear model
@@ -99,9 +100,12 @@ K_fb_gain = dlqr(Ad, Bd, Q_LQR, R_LQR);
 
 %% Solve QP problem with linear model and non-linear constraint
 options = optimoptions(@fmincon, 'Algorithm', 'sqp'); % Set SQP algorithm
+
+costFunc = @(z) 0.5*z'*Q*z;
+
+
 tic
-[z,lambda] = fmincon(@(z) genCostFunc(z,Q) , z0, [], [], ...
-    Aeq, beq, vlb, vub, @(c, ceq) NonLinConstraint(z, alfa, beta, lambda_t, mx, N), options);
+[z,lambda] = fmincon(costFunc , z0, [], [], Aeq, beq, vlb, vub, @nonlincon, options);
 t1=toc;
 
 % Calculate objective value
@@ -116,39 +120,50 @@ end
 
 
 %% Extract control inputs and states
-u  = [z(N*mx+1:N*mx+M*mu);z(N*mx+M*mu)]; % Control input from solution
+u1 = [z(N*mx+1:2:N*mx+M*mu);0];
+u2 = [z(N*mx+2:2:N*mx+M*mu);0];
+%u  = [z(N*mx+1:2:N*mx+M*mu),z(N*mx+2:2:N*mx+M*mu)]; % Control input from solution
 
 x1 = [x0(1);z(1:mx:N*mx)];              % State x1 from solution
 x2 = [x0(2);z(2:mx:N*mx)];              % State x2 from solution
 x3 = [x0(3);z(3:mx:N*mx)];              % State x3 from solution
 x4 = [x0(4);z(4:mx:N*mx)];              % State x4 from solution
+x5 = [x0(5);z(5:mx:N*mx)];              % State x5 from solution
+x6 = [x0(6);z(6:mx:N*mx)];              % State x6 from solution
 
 
 num_variables = 5/delta_t;
 zero_padding = zeros(num_variables,1);
 unit_padding  = ones(num_variables,1);
 
-u   = [zero_padding; u; zero_padding];
+u1  = [zero_padding; u1; zero_padding;];
+u2  = [zero_padding; u2; zero_padding;];
 x1  = [pi*unit_padding; x1; zero_padding];
 x2  = [zero_padding; x2; zero_padding];
 x3  = [zero_padding; x3; zero_padding];
 x4  = [zero_padding; x4; zero_padding];
-x = [x1, x2, x3, x4];                   % Trajectory of all states
+x5  = [zero_padding; x5; zero_padding];
+x6  = [zero_padding; x6; zero_padding];
 
-%% Plotting
-t = 0:delta_t:delta_t*(length(u)-1);
+x = [x1, x2, x3, x4, x5, x6];                   % Trajectory of all states
+u = [u1, u2];
 
-figure(1)
-subplot(511)
-stairs(t,u),grid
-ylabel('u')
-subplot(512)
-plot(t,x1.*180/pi,'m',t,x1.*180/pi,'mo'),grid
-ylabel('lambda')
+
+
 
 %% Time series for Simulink
+t = 0:delta_t:delta_t*(length(u)-1);
 u_timeSeries = timeseries(u,t);
 x_timeSeries = timeseries(x,t);
+display(t(end));
 log_name_order = ["time [s]" "Travel [rad]" "Travel rate [rad]" "pitch [rad]" "pitch rate [rad]" "elevation [rad]" "elevation rate [rad]" "u (input)" "e_ref [rad]" "Vd" "Vs" "Vf" "Vb"];
 save('workspace_variables.mat');
 
+%%Define non-linear constraint
+function [c, ceq] = nonlincon(z)
+global mx N lambda_k alfa beta lambda_t
+lambda_k = z(1:mx:N*mx);
+e_k = z(5:mx:N*mx);
+c = alfa*exp(-beta*(lambda_k-lambda_t).^2)-e_k;
+ceq = [];
+end
