@@ -7,9 +7,9 @@
  *
  * Code generation for model "helicopter".
  *
- * Model version              : 11.12
+ * Model version              : 11.33
  * Simulink Coder version : 9.4 (R2020b) 29-Jul-2020
- * C source code generated on : Mon Feb 21 11:47:06 2022
+ * C source code generated on : Mon Mar 28 12:49:22 2022
  *
  * Target selection: quarc_win64.tlc
  * Note: GRT includes extra infrastructure and instrumentation for prototyping
@@ -62,7 +62,7 @@ static const char_T * rtDataTypeNames[] = {
 
 /* data type transitions for block I/O structure */
 static DataTypeTransition rtBTransitions[] = {
-  { (char_T *)(&helicopter_B.u), 0, 0, 26 }
+  { (char_T *)(&helicopter_B.Constant), 0, 0, 34 }
   ,
 
   { (char_T *)(&helicopter_DW.HILInitialize_AIMinimums[0]), 0, 0, 70 },
@@ -71,13 +71,13 @@ static DataTypeTransition rtBTransitions[] = {
 
   { (char_T *)(&helicopter_DW.HILReadEncoderTimebase_Task), 15, 0, 1 },
 
-  { (char_T *)(&helicopter_DW.FromWorkspace_PWORK.TimePtr), 11, 0, 16 },
+  { (char_T *)(&helicopter_DW.Scope1_PWORK.LoggedData), 11, 0, 20 },
 
   { (char_T *)(&helicopter_DW.HILInitialize_ClockModes[0]), 6, 0, 46 },
 
   { (char_T *)(&helicopter_DW.HILInitialize_POSortedChans[0]), 7, 0, 8 },
 
-  { (char_T *)(&helicopter_DW.FromWorkspace_IWORK.PrevIndex), 10, 0, 2 },
+  { (char_T *)(&helicopter_DW.FromWorkspace1_IWORK.PrevIndex), 10, 0, 3 },
 
   { (char_T *)(&helicopter_DW.If_ActiveSubsystem), 2, 0, 2 }
 };
@@ -90,7 +90,7 @@ static DataTypeTransitionTable rtBTransTable = {
 
 /* data type transitions for Parameters structure */
 static DataTypeTransition rtPTransitions[] = {
-  { (char_T *)(&helicopter_P.K_ed), 0, 0, 9 },
+  { (char_T *)(&helicopter_P.K_ed), 0, 0, 21 },
 
   { (char_T *)(&helicopter_P.HILWriteAnalog_channels[0]), 7, 0, 2 },
 

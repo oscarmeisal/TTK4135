@@ -1,0 +1,1 @@
+Bound on travel rate: +- 0.5.

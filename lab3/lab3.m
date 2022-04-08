@@ -15,6 +15,30 @@ objective function?
 4. What causes the deviation?
     Bad model and no feedback.
  %}
+%% Notes from lab 3
+%{
+Tried setting a high Q(1)-value because the travel trajectory is the one
+being optimized in the first point. Getting a small (~0.3-0.4) steady
+state error on travel angle, and about 0.1 rad error on pitch. Travel
+rate is however steady at 0. We think this is due to a model error.
+Either, the motors have different thrust, so that a small pitch angle is
+neccesary to achieve zero travel rate. Another cause could be that the
+propellars are not equally aligned in the z-axis, leading to a torque
+about the middlepoint of the two propellars. This leads to a natural
+rotation, which is counteracted by a small pitch angle.
+
+MPC:
+The MPC could be implemented be replacing the LQR in simulink with function
+that takes in the optimal and current state, and calculates (using quadprog) an optimal
+trajectory from current state to the optimal sate for each time step.
+
+An MPC would require substantialy more computational power,
+which might be an issue.
+MPC relies on the model for computing the next optimal input, while the LQR
+relies on the error. If the accuracy of the model would affect an MPC more
+than an LQR.
+%}
+
 clear; clc;
 %% Initialization and model definition
 init05;
@@ -46,7 +70,7 @@ x0_4 = 0;                               % p_dot
 x0 = [x0_1 x0_2 x0_3 x0_4]';            % Initial values
 
 % Time horizon and initialization
-N  = 100;                               % Time horizon for states
+N  = 40;                               % Time horizon for states
 M  = N;                                 % Time horizon for inputs
 z  = zeros(N*mx+M*mu,1);                % Initialize z for the whole horizon
 z0 = z;                                 % Initial value for optimization
@@ -131,6 +155,6 @@ log_name_order = ["time [s]" "Travel [rad]" "Travel rate [rad]" "pitch [rad]" "p
 save('workspace_variables.mat');
 
 %% Calculate K gain matrix
-Q_LQR = diag([1, 2, 3, 4]);
-R_LQR = diag(1);
+Q_LQR = diag([100, 1, 1, 1]);
+R_LQR = diag(50);
 K_fb_gain = dlqr(Ad, Bd, Q_LQR, R_LQR);

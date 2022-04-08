@@ -7,9 +7,9 @@
  *
  * Code generation for model "helicopter".
  *
- * Model version              : 11.12
+ * Model version              : 11.33
  * Simulink Coder version : 9.4 (R2020b) 29-Jul-2020
- * C source code generated on : Mon Feb 21 11:47:06 2022
+ * C source code generated on : Mon Mar 28 12:49:22 2022
  *
  * Target selection: quarc_win64.tlc
  * Note: GRT includes extra infrastructure and instrumentation for prototyping
@@ -26,37 +26,45 @@ P_helicopter_T helicopter_P = {
   /* Variable: K_ed
    * Referenced by: '<S3>/K_ed'
    */
-  14.311926605504587,
+  13.923207611281008,
 
   /* Variable: K_ei
    * Referenced by: '<S3>/K_ei'
    */
-  0.3577981651376147,
+  0.34808019028202519,
 
   /* Variable: K_ep
    * Referenced by: '<S3>/K_ep'
    */
-  3.5779816513761467,
+  3.4808019028202519,
+
+  /* Variable: K_fb_gain
+   * Referenced by: '<S6>/Gain'
+   */
+  { -0.6488300104973207, -9.1607744364894542E-17, -2.4746501257144837,
+    4.5350321532069453E-16, 1.3121992425464168, -4.0787316490337946E-16,
+    0.46249151936296473, -1.3591276019760371E-16, 3.6076332963304578E-16,
+    0.38972195579780322, -4.4557494025562008E-16, 0.51805191308723841 },
 
   /* Variable: K_pd
    * Referenced by: '<S5>/K_pd'
    */
-  6.7376146788990825,
+  6.5546177370030589,
 
   /* Variable: K_pp
    * Referenced by: '<S5>/K_pp'
    */
-  6.0638532110091745,
+  5.8991559633027535,
 
   /* Variable: Vd_ff
    * Referenced by: '<Root>/Vd_bias'
    */
-  0.2,
+  0.1,
 
   /* Variable: Vs_ff
    * Referenced by: '<Root>/Vs_bias'
    */
-  8.1,
+  7.88,
 
   /* Variable: elevation_gain
    * Referenced by: '<S4>/Elevation_gain'
@@ -158,10 +166,15 @@ P_helicopter_T helicopter_P = {
    */
   0.0,
 
-  /* Expression: 180/pi
-   * Referenced by: '<Root>/Gain'
+  /* Expression: qc_get_step_size
+   * Referenced by: '<Root>/Constant'
    */
-  57.295779513082323,
+  0.002,
+
+  /* Expression: 180
+   * Referenced by: '<Root>/Constant1'
+   */
+  180.0,
 
   /* Expression: 2*pi/8192
    * Referenced by: '<S4>/Travel: Count to rad'
@@ -169,17 +182,7 @@ P_helicopter_T helicopter_P = {
   0.00076699039394282058,
 
   /* Expression: 180/pi
-   * Referenced by: '<S12>/Gain'
-   */
-  57.295779513082323,
-
-  /* Expression: 2*pi /4096
-   * Referenced by: '<S4>/Pitch: Count to rad'
-   */
-  0.0015339807878856412,
-
-  /* Expression: 180/pi
-   * Referenced by: '<S9>/Gain'
+   * Referenced by: '<S13>/Gain'
    */
   57.295779513082323,
 
@@ -199,7 +202,17 @@ P_helicopter_T helicopter_P = {
   10.0,
 
   /* Expression: 180/pi
-   * Referenced by: '<S13>/Gain'
+   * Referenced by: '<S14>/Gain'
+   */
+  57.295779513082323,
+
+  /* Expression: 2*pi /4096
+   * Referenced by: '<S4>/Pitch: Count to rad'
+   */
+  0.0015339807878856412,
+
+  /* Expression: 180/pi
+   * Referenced by: '<S10>/Gain'
    */
   57.295779513082323,
 
@@ -219,7 +232,7 @@ P_helicopter_T helicopter_P = {
   30.0,
 
   /* Expression: 180/pi
-   * Referenced by: '<S10>/Gain'
+   * Referenced by: '<S11>/Gain'
    */
   57.295779513082323,
 
@@ -229,7 +242,7 @@ P_helicopter_T helicopter_P = {
   -0.0015339807878856412,
 
   /* Expression: 180/pi
-   * Referenced by: '<S7>/Gain'
+   * Referenced by: '<S8>/Gain'
    */
   57.295779513082323,
 
@@ -254,7 +267,7 @@ P_helicopter_T helicopter_P = {
   10.0,
 
   /* Expression: 180/pi
-   * Referenced by: '<S8>/Gain'
+   * Referenced by: '<S9>/Gain'
    */
   57.295779513082323,
 
@@ -262,11 +275,6 @@ P_helicopter_T helicopter_P = {
    * Referenced by: '<S2>/Gain1'
    */
   0.017453292519943295,
-
-  /* Expression: 0
-   * Referenced by: '<Root>/elevation_ref'
-   */
-  0.0,
 
   /* Expression: 0
    * Referenced by: '<S3>/Integrator'
@@ -294,7 +302,7 @@ P_helicopter_T helicopter_P = {
   0.5,
 
   /* Expression: 180/pi
-   * Referenced by: '<S11>/Gain'
+   * Referenced by: '<S12>/Gain'
    */
   57.295779513082323,
 
